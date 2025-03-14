@@ -3,6 +3,6 @@ syntax = 'proto3';
 package data;
 
 message Data {
-    int value = 1;
-    int timestamp = 2;
+    int32 value = 1;
+    int64 timestamp = 2;
 }
