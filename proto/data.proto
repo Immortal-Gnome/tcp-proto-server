@@ -1,0 +1,8 @@
+syntax = 'proto3';
+
+package data;
+
+message Data {
+    int value = 1;
+    int timestamp = 2;
+}
