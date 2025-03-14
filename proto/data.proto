@@ -2,7 +2,7 @@ syntax = 'proto3';
 
 package data;
 
-option go_package = "github.com/fazilhus/tcp-proto-server/proto";
+option go_package = ".";
 
 message Data {
     int32 value = 1;
