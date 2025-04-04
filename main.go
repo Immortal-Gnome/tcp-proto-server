@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/golang/protobuf/proto"
 	"log"
 	"net"
 	"os"
-	"tcp-proto-server/proto"
+	data "tcp-proto-server/proto"
+	"time"
+
+	"google.golang.org/protobuf/proto"
 )
 
 const PORT = ":7000"
@@ -26,7 +28,7 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn) {
+/* func handleConnection(conn net.Conn) {
 	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())
 	defer conn.Close()
 
@@ -44,4 +46,54 @@ func handleConnection(conn net.Conn) {
 	}
 
 	log.Printf("Info: wrote %d bytes\n", length)
+} */
+
+func handleConnection(conn net.Conn) {
+	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())
+	defer conn.Close()
+
+	// Create a buffer to read incoming data
+	buffer := make([]byte, 1024)
+
+	// Read data from the connection
+	n, err := conn.Read(buffer)
+	if err != nil {
+		log.Printf("ERROR: could not read from connection (%v)\n", err)
+		return
+	}
+
+	log.Printf("Info: read %d bytes\n", n)
+
+	// Unmarshal the received protobuf message
+	var receivedMsg data.Data
+	if err := proto.Unmarshal(buffer[:n], &receivedMsg); err != nil {
+		log.Printf("ERROR: could not decode message (%v)\n", err)
+		return
+	}
+
+	// Process the received message
+	log.Printf("Info: received message with value=%d and timestamp=%d\n",
+		receivedMsg.Value, receivedMsg.Timestamp)
+
+	// Example: Update the value and send response back
+	responseMsg := data.Data{
+		Value:     receivedMsg.Value * 2, // Example processing: double the value
+		Timestamp: time.Now().Unix(),
+	}
+
+	// Marshal the response message
+	responseData, err := proto.Marshal(&responseMsg)
+	if err != nil {
+		log.Printf("ERROR: could not encode response message (%v)\n", err)
+		return
+	}
+
+	// Send the response back to the client
+	length, err := conn.Write(responseData)
+	if err != nil {
+		log.Printf("ERROR: could not write response to connection (%v)\n", err)
+		return
+	}
+
+	log.Printf("Info: wrote %d bytes as response\n", length)
 }
