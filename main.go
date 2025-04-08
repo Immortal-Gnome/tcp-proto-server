@@ -8,11 +8,15 @@ import (
 	"net"
 	"os"
 	"tcp-proto-server/grid"
+	data "tcp-proto-server/proto"
+
+	"google.golang.org/protobuf/proto"
 )
 
 const PORT = ":7000"
 
 var _grid *grid.Grid
+var pending_grid_update bool
 
 func main() {
 	listener, err := net.Listen("tcp", PORT)
@@ -37,6 +41,7 @@ func handleConnection(conn net.Conn) {
 	// Log new connection
 	log.Printf("Info: new client connected from %s\n", clientAddr)
 
+	var update_package *data.Grid_Data = nil
 	// Handle client connection
 	buffer := make([]byte, 4) // Buffer size for an int32
 	for {
@@ -50,36 +55,91 @@ func handleConnection(conn net.Conn) {
 			break
 		}
 
-		// Process the received int
-		if n == 4 { // Expecting 4 bytes for an int32
-			// Convert the 4 bytes to an integer
+		if n == 4 {
 			receivedInt := int32(binary.LittleEndian.Uint32(buffer[:4]))
-			//log.Printf("Received integer %d from client %s\n", receivedInt, clientAddr)
 			if receivedInt == 1 {
-				log.Println("Creating Grid")
-				//_create_grid()
+				log.Println("\nCreating Grid\n")
+				_create_grid()
+				pending_grid_update = true
 			}
+
 			if receivedInt == 2 {
-				log.Println("Coloring Tile")
+				log.Println("\nColoring Tile\n")
+				_color_random_tile()
+				pending_grid_update = true
 			}
 			if receivedInt == 3 {
-				log.Println("Coloring All Tiles")
+				log.Println("\nColoring All Tiles\n")
+				_color_all_tiles()
+				pending_grid_update = true
 			}
+
 			if receivedInt == 4 {
 				log.Println("Clear All Tiles")
+				_clear_all_tiles()
+				pending_grid_update = true
 			}
-			//log.Printf("Raw bytes received: %v", buffer[:n])
+
+			if receivedInt == 5 {
+				_grid.Print()
+
+			}
+
 		} else {
 			log.Printf("Warning: Received unexpected data size: %d bytes from %s\n", n, clientAddr)
 		}
+
+		if pending_grid_update {
+			update_package = prepare_grid_update_package()
+			transmit_grid_update(conn, update_package)
+			pending_grid_update = false
+			log.Println("Pending_Update_DONE")
+		}
 	}
 
-	// Close the connection when done
 	conn.Close()
 }
 
+func prepare_grid_update_package() *data.Grid_Data {
+
+	_grid_data := new(data.Grid_Data)
+
+	for x := 0; x < _grid.Width(); x++ {
+		for y := 0; y < _grid.Height(); y++ {
+			color := _grid.Get_Color(x, y)
+			_tile_data := data.Tile_Data{
+				R: float64(*color.Red()),
+				G: float64(*color.Green()),
+				B: float64(*color.Blue()),
+				X: int32(x),
+				Y: int32(y),
+			}
+			_grid_data.Tiles = append(_grid_data.Tiles, &_tile_data)
+		}
+	}
+	log.Println("preparing big pile of shit")
+	return _grid_data
+}
+
+func transmit_grid_update(conn net.Conn, data *data.Grid_Data) {
+	// Marshal the response message
+	responseData, err := proto.Marshal(data)
+	if err != nil {
+		log.Printf("ERROR: could not encode response message (%v)\n", err)
+		return
+	}
+
+	// Send the response back to the client
+	length, err := conn.Write(responseData)
+	if err != nil {
+		log.Printf("ERROR: could not write response to connection (%v)\n", err)
+		return
+	}
+	log.Printf("Info: wrote %d bytes as response\n", length)
+}
+
 func _create_grid() {
-	if _grid == nil {
+	if _grid != nil {
 		log.Println("grid already defined")
 		return
 	}
@@ -87,41 +147,43 @@ func _create_grid() {
 }
 
 func _color_random_tile() {
-	x := rand.Intn(_grid.Width())
-	y := rand.Intn(_grid.Height())
-	var _ grid.Tile
-	_, _ = _grid.Get(x, y)
+	x := rand.Intn(_grid.Width() - 1)
+	y := rand.Intn(_grid.Height() - 1)
+	var tile grid.Tile
+	tile, _ = _grid.Get(x, y)
 
-	/* 	// Use the tile by setting its color
-	   	color := grid.NewColor()
-	   	color = grid.SetRandom(color)
-
-	   	// Update the tile in the grid with the new color
-	   	_grid.SetColor(x, y, *color) */
+	color := grid.NewColor()
+	color = grid.SetRandom(color)
+	tile.Set(color)
+	_grid.Set(x, y, tile)
 
 }
 
-// Old Handle Connections Message, keeping this here for now
-
-/* func handleConnection(conn net.Conn) {
-	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())
-	defer conn.Close()
-
-	msg := data.Data{Value: 1, Timestamp: 0}
-	d, err := proto.Marshal(&msg)
-	if err != nil {
-		log.Printf("ERROR: could not encode message (%v)\n", err)
-		return
+func _color_all_tiles() {
+	for x := 0; x < _grid.Width(); x++ {
+		for y := 0; y < _grid.Height(); y++ {
+			var tile grid.Tile
+			tile, _ = _grid.Get(x, y)
+			color := grid.NewColor()
+			color = grid.SetRandom(color)
+			tile.Set(color)
+			_grid.Set(x, y, tile)
+		}
 	}
+}
 
-	length, err := conn.Write(d)
-	if err != nil {
-		log.Printf("ERROR: could not write to connection (%v)\n", err)
-		return
+func _clear_all_tiles() {
+	for x := 0; x < _grid.Width(); x++ {
+		for y := 0; y < _grid.Height(); y++ {
+			var tile grid.Tile
+			tile, _ = _grid.Get(x, y)
+			color := grid.NewColor()
+			color = grid.SetWhite(color)
+			tile.Set(color)
+			_grid.Set(x, y, tile)
+		}
 	}
-
-	log.Printf("Info: wrote %d bytes\n", length)
-} */
+}
 
 /* func handleConnection(conn net.Conn) {
 	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())

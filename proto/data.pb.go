@@ -73,29 +73,27 @@ func (x *Data) GetTimestamp() int64 {
 	return 0
 }
 
-type Color_Data struct {
+type Grid_Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	R             []byte                 `protobuf:"bytes,1,opt,name=r,proto3" json:"r,omitempty"`
-	G             []byte                 `protobuf:"bytes,2,opt,name=g,proto3" json:"g,omitempty"`
-	B             []byte                 `protobuf:"bytes,3,opt,name=b,proto3" json:"b,omitempty"`
+	Tiles         []*Tile_Data           `protobuf:"bytes,1,rep,name=tiles,proto3" json:"tiles,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Color_Data) Reset() {
-	*x = Color_Data{}
+func (x *Grid_Data) Reset() {
+	*x = Grid_Data{}
 	mi := &file_data_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Color_Data) String() string {
+func (x *Grid_Data) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Color_Data) ProtoMessage() {}
+func (*Grid_Data) ProtoMessage() {}
 
-func (x *Color_Data) ProtoReflect() protoreflect.Message {
+func (x *Grid_Data) ProtoReflect() protoreflect.Message {
 	mi := &file_data_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -107,30 +105,92 @@ func (x *Color_Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Color_Data.ProtoReflect.Descriptor instead.
-func (*Color_Data) Descriptor() ([]byte, []int) {
+// Deprecated: Use Grid_Data.ProtoReflect.Descriptor instead.
+func (*Grid_Data) Descriptor() ([]byte, []int) {
 	return file_data_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Color_Data) GetR() []byte {
+func (x *Grid_Data) GetTiles() []*Tile_Data {
+	if x != nil {
+		return x.Tiles
+	}
+	return nil
+}
+
+type Tile_Data struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	R             float64                `protobuf:"fixed64,1,opt,name=r,proto3" json:"r,omitempty"`
+	G             float64                `protobuf:"fixed64,2,opt,name=g,proto3" json:"g,omitempty"`
+	B             float64                `protobuf:"fixed64,3,opt,name=b,proto3" json:"b,omitempty"`
+	X             int32                  `protobuf:"varint,4,opt,name=x,proto3" json:"x,omitempty"`
+	Y             int32                  `protobuf:"varint,5,opt,name=y,proto3" json:"y,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Tile_Data) Reset() {
+	*x = Tile_Data{}
+	mi := &file_data_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tile_Data) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tile_Data) ProtoMessage() {}
+
+func (x *Tile_Data) ProtoReflect() protoreflect.Message {
+	mi := &file_data_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tile_Data.ProtoReflect.Descriptor instead.
+func (*Tile_Data) Descriptor() ([]byte, []int) {
+	return file_data_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Tile_Data) GetR() float64 {
 	if x != nil {
 		return x.R
 	}
-	return nil
+	return 0
 }
 
-func (x *Color_Data) GetG() []byte {
+func (x *Tile_Data) GetG() float64 {
 	if x != nil {
 		return x.G
 	}
-	return nil
+	return 0
 }
 
-func (x *Color_Data) GetB() []byte {
+func (x *Tile_Data) GetB() float64 {
 	if x != nil {
 		return x.B
 	}
-	return nil
+	return 0
+}
+
+func (x *Tile_Data) GetX() int32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *Tile_Data) GetY() int32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
 }
 
 type Request_Data struct {
@@ -142,7 +202,7 @@ type Request_Data struct {
 
 func (x *Request_Data) Reset() {
 	*x = Request_Data{}
-	mi := &file_data_proto_msgTypes[2]
+	mi := &file_data_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -154,7 +214,7 @@ func (x *Request_Data) String() string {
 func (*Request_Data) ProtoMessage() {}
 
 func (x *Request_Data) ProtoReflect() protoreflect.Message {
-	mi := &file_data_proto_msgTypes[2]
+	mi := &file_data_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -167,7 +227,7 @@ func (x *Request_Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Request_Data.ProtoReflect.Descriptor instead.
 func (*Request_Data) Descriptor() ([]byte, []int) {
-	return file_data_proto_rawDescGZIP(), []int{2}
+	return file_data_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Request_Data) GetType() int32 {
@@ -185,12 +245,15 @@ const file_data_proto_rawDesc = "" +
 	"data.proto\x12\x04data\":\n" +
 	"\x04Data\x12\x14\n" +
 	"\x05value\x18\x01 \x01(\x05R\x05value\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"6\n" +
-	"\n" +
-	"Color_Data\x12\f\n" +
-	"\x01r\x18\x01 \x01(\fR\x01r\x12\f\n" +
-	"\x01g\x18\x02 \x01(\fR\x01g\x12\f\n" +
-	"\x01b\x18\x03 \x01(\fR\x01b\"\"\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"2\n" +
+	"\tGrid_Data\x12%\n" +
+	"\x05tiles\x18\x01 \x03(\v2\x0f.data.Tile_DataR\x05tiles\"Q\n" +
+	"\tTile_Data\x12\f\n" +
+	"\x01r\x18\x01 \x01(\x01R\x01r\x12\f\n" +
+	"\x01g\x18\x02 \x01(\x01R\x01g\x12\f\n" +
+	"\x01b\x18\x03 \x01(\x01R\x01b\x12\f\n" +
+	"\x01x\x18\x04 \x01(\x05R\x01x\x12\f\n" +
+	"\x01y\x18\x05 \x01(\x05R\x01y\"\"\n" +
 	"\fRequest_Data\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\x05R\x04typeB\aZ\x05/datab\x06proto3"
 
@@ -206,18 +269,20 @@ func file_data_proto_rawDescGZIP() []byte {
 	return file_data_proto_rawDescData
 }
 
-var file_data_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_data_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_data_proto_goTypes = []any{
 	(*Data)(nil),         // 0: data.Data
-	(*Color_Data)(nil),   // 1: data.Color_Data
-	(*Request_Data)(nil), // 2: data.Request_Data
+	(*Grid_Data)(nil),    // 1: data.Grid_Data
+	(*Tile_Data)(nil),    // 2: data.Tile_Data
+	(*Request_Data)(nil), // 3: data.Request_Data
 }
 var file_data_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: data.Grid_Data.tiles:type_name -> data.Tile_Data
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_data_proto_init() }
@@ -231,7 +296,7 @@ func file_data_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_data_proto_rawDesc), len(file_data_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

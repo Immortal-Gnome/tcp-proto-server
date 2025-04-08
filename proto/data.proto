@@ -9,11 +9,17 @@ message Data {
     int64 timestamp = 2;
 }
 
+message Grid_Data {
+    repeated Tile_Data tiles = 1;
+}
 
-message Color_Data {
-    bytes r = 1;
-    bytes g = 2;
-    bytes b = 3;
+
+message Tile_Data {
+    double r = 1;
+    double g = 2;
+    double b = 3;
+    int32 x = 4;
+    int32 y = 5;
 }
 
 

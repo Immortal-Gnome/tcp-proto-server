@@ -14,6 +14,9 @@ func New(width, height int) *Grid {
 	cells := make([][]Tile, height)
 	for i := range cells {
 		cells[i] = make([]Tile, width)
+		for j := range cells[i] {
+			cells[i][j] = Tile{c: NewColor()} // Initialize with a new color
+		}
 	}
 	return &Grid{
 		width:  width,
@@ -50,14 +53,18 @@ func (g *Grid) Height() int {
 func (g *Grid) Print() {
 	for y := 0; y < g.height; y++ {
 		for x := 0; x < g.width; x++ {
-			fmt.Printf("%3d ", g.cells[y][x])
+			fmt.Printf("Tile %d,%d\n", x, y) // Use Printf with %d for integers
+			fmt.Printf("red: %f ", g.cells[y][x].c.r)
+			fmt.Printf("green: %f ", g.cells[y][x].c.g) // Changed .r to .g
+			fmt.Printf("blue: %f ", g.cells[y][x].c.b)
+			fmt.Println("\n_____________________________")
 		}
 		fmt.Println()
 	}
 }
 
 func (g *Grid) Get_Color(x, y int) *Color {
-	return &g.cells[x][y].c
+	return g.cells[x][y].c
 }
 
 func (g *Grid) Set_Color(x, y int, _c Color) bool {
