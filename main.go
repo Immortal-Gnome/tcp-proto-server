@@ -1,16 +1,18 @@
 package main
 
 import (
+	"encoding/binary"
+	"io"
 	"log"
+	"math/rand"
 	"net"
 	"os"
-	data "tcp-proto-server/proto"
-	"time"
-
-	"google.golang.org/protobuf/proto"
+	"tcp-proto-server/grid"
 )
 
 const PORT = ":7000"
+
+var _grid *grid.Grid
 
 func main() {
 	listener, err := net.Listen("tcp", PORT)
@@ -27,6 +29,79 @@ func main() {
 		}
 	}
 }
+
+func handleConnection(conn net.Conn) {
+	// Get client address information
+	clientAddr := conn.RemoteAddr().String()
+
+	// Log new connection
+	log.Printf("Info: new client connected from %s\n", clientAddr)
+
+	// Handle client connection
+	buffer := make([]byte, 4) // Buffer size for an int32
+	for {
+		n, err := conn.Read(buffer)
+		if err != nil {
+			if err == io.EOF {
+				log.Printf("Info: client %s disconnected\n", clientAddr)
+			} else {
+				log.Printf("ERROR: reading from client %s (%v)\n", clientAddr, err)
+			}
+			break
+		}
+
+		// Process the received int
+		if n == 4 { // Expecting 4 bytes for an int32
+			// Convert the 4 bytes to an integer
+			receivedInt := int32(binary.LittleEndian.Uint32(buffer[:4]))
+			//log.Printf("Received integer %d from client %s\n", receivedInt, clientAddr)
+			if receivedInt == 1 {
+				log.Println("Creating Grid")
+				//_create_grid()
+			}
+			if receivedInt == 2 {
+				log.Println("Coloring Tile")
+			}
+			if receivedInt == 3 {
+				log.Println("Coloring All Tiles")
+			}
+			if receivedInt == 4 {
+				log.Println("Clear All Tiles")
+			}
+			//log.Printf("Raw bytes received: %v", buffer[:n])
+		} else {
+			log.Printf("Warning: Received unexpected data size: %d bytes from %s\n", n, clientAddr)
+		}
+	}
+
+	// Close the connection when done
+	conn.Close()
+}
+
+func _create_grid() {
+	if _grid == nil {
+		log.Println("grid already defined")
+		return
+	}
+	_grid = grid.New(5, 5)
+}
+
+func _color_random_tile() {
+	x := rand.Intn(_grid.Width())
+	y := rand.Intn(_grid.Height())
+	var _ grid.Tile
+	_, _ = _grid.Get(x, y)
+
+	/* 	// Use the tile by setting its color
+	   	color := grid.NewColor()
+	   	color = grid.SetRandom(color)
+
+	   	// Update the tile in the grid with the new color
+	   	_grid.SetColor(x, y, *color) */
+
+}
+
+// Old Handle Connections Message, keeping this here for now
 
 /* func handleConnection(conn net.Conn) {
 	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())
@@ -48,7 +123,7 @@ func main() {
 	log.Printf("Info: wrote %d bytes\n", length)
 } */
 
-func handleConnection(conn net.Conn) {
+/* func handleConnection(conn net.Conn) {
 	log.Printf("Info: new connection from %s\n", conn.RemoteAddr())
 	defer conn.Close()
 
@@ -97,3 +172,4 @@ func handleConnection(conn net.Conn) {
 
 	log.Printf("Info: wrote %d bytes as response\n", length)
 }
+*/

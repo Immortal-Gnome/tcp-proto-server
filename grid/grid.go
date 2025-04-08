@@ -38,6 +38,14 @@ func (g *Grid) Get(x, y int) (Tile, error) {
 	return g.cells[y][x], nil
 }
 
+func (g *Grid) Width() int {
+	return g.width
+}
+
+func (g *Grid) Height() int {
+	return g.height
+}
+
 // Print displays the grid
 func (g *Grid) Print() {
 	for y := 0; y < g.height; y++ {
