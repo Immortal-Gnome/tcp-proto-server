@@ -8,3 +8,21 @@ message Data {
     int32 value = 1;
     int64 timestamp = 2;
 }
+
+message Grid_Data {
+    repeated Tile_Data tiles = 1;
+}
+
+
+message Tile_Data {
+    double r = 1;
+    double g = 2;
+    double b = 3;
+    int32 x = 4;
+    int32 y = 5;
+}
+
+
+message Request_Data {
+    int32 type = 1;
+}
