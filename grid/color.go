@@ -37,7 +37,7 @@ func (c *Color) Red() *float32 {
 }
 
 func (c *Color) Green() *float32 {
-	return &c.b
+	return &c.g
 }
 
 func (c *Color) Blue() *float32 {
